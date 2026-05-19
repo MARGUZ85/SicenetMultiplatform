@@ -1,4 +1,4 @@
-package com.example.marsphotos.ui
+package com.example.sicenetmultiplatform.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,17 +16,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
-import com.example.marsphotos.ui.screens.*
+
+import com.example.sicenetmultiplatform.ui.screens.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MarsPhotosApp() {
+fun MarsPhotosApp(sicenetViewModel: SicenetViewModel) {
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val sicenetViewModel: SicenetViewModel =
-        viewModel(factory = SicenetViewModel.Factory)
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),

@@ -1,38 +1,37 @@
-package com.example.marsphotos.data
+package com.example.sicenetmultiplatform.data
 
-import com.example.marsphotos.data.local.AcademicLoadEntity
-import com.example.marsphotos.data.local.CardexEntity
-import com.example.marsphotos.data.local.FinalGradesEntity
-import com.example.marsphotos.data.local.UnitGradesEntity
-import kotlinx.serialization.InternalSerializationApi
-import org.json.JSONArray
+import com.example.sicenetmultiplatform.data.local.AcademicLoadEntity
+import com.example.sicenetmultiplatform.data.local.CardexEntity
+import com.example.sicenetmultiplatform.data.local.FinalGradesEntity
+import com.example.sicenetmultiplatform.data.local.UnitGradesEntity
+import kotlinx.serialization.json.*
 
 /**
  * [CAPA DE DATOS - PARSER (Extractores de Texto)]
  * Objeto encargado de procesar las respuestas del servidor de Sicenet.
  */
-@OptIn(InternalSerializationApi::class)
 object SicenetParser {
 
-    private fun org.json.JSONObject.optStringSafe(key: String): String {
-        if (has(key)) return optString(key)
+    private val jsonParser = Json { ignoreUnknownKeys = true }
+
+    private fun JsonObject.optStringSafe(key: String): String {
+        this[key]?.jsonPrimitive?.content?.let { return it }
         val pascal = key.replaceFirstChar { it.uppercase() }
-        if (has(pascal)) return optString(pascal)
-        if (has(key.uppercase())) return optString(key.uppercase())
+        this[pascal]?.jsonPrimitive?.content?.let { return it }
+        this[key.uppercase()]?.jsonPrimitive?.content?.let { return it }
         val camel = key.replaceFirstChar { it.lowercase() }
-        if (has(camel)) return optString(camel)
-        if (has("str$pascal")) return optString("str$pascal")
+        this[camel]?.jsonPrimitive?.content?.let { return it }
+        this["str$pascal"]?.jsonPrimitive?.content?.let { return it }
         return ""
     }
 
-    private fun org.json.JSONObject.optIntSafe(key: String): Int {
-        if (has(key)) return optInt(key)
+    private fun JsonObject.optIntSafe(key: String): Int {
+        this[key]?.jsonPrimitive?.intOrNull?.let { return it }
         val pascal = key.replaceFirstChar { it.uppercase() }
-        if (has(pascal)) return optInt(pascal)
+        this[pascal]?.jsonPrimitive?.intOrNull?.let { return it }
         return 0
     }
 
-    @OptIn(InternalSerializationApi::class)
     fun parseAcademicLoad(xml: String): List<AcademicLoadEntity> {
         var entities = parseJsonAcademicLoad(xml)
         if (entities.isEmpty()) {
@@ -41,15 +40,14 @@ object SicenetParser {
         return entities
     }
 
-    @OptIn(InternalSerializationApi::class)
     private fun parseJsonAcademicLoad(xml: String): List<AcademicLoadEntity> {
         val entities = mutableListOf<AcademicLoadEntity>()
         try {
             val jsonString = extractJsonContent(xml)
             if (jsonString.startsWith("[")) {
-                val jsonArray = JSONArray(jsonString)
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
+                val jsonArray = jsonParser.parseToJsonElement(jsonString).jsonArray
+                for (element in jsonArray) {
+                    val obj = element.jsonObject
                     entities.add(
                         AcademicLoadEntity(
                             materia = obj.optStringSafe("materia"),
@@ -75,7 +73,6 @@ object SicenetParser {
         return entities
     }
 
-    @OptIn(InternalSerializationApi::class)
     private fun parseXmlAcademicLoad(xml: String): List<AcademicLoadEntity> {
         val entities = mutableListOf<AcademicLoadEntity>()
         try {
@@ -132,9 +129,9 @@ object SicenetParser {
         try {
             val jsonString = extractJsonContent(xml)
             if (jsonString.startsWith("[")) {
-                val jsonArray = JSONArray(jsonString)
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
+                val jsonArray = jsonParser.parseToJsonElement(jsonString).jsonArray
+                for (element in jsonArray) {
+                    val obj = element.jsonObject
                     entities.add(
                         CardexEntity(
                             materia = obj.optStringSafe("materia"),
@@ -203,9 +200,9 @@ object SicenetParser {
         try {
             val jsonString = extractJsonContent(xml)
             if (jsonString.startsWith("[")) {
-                val jsonArray = JSONArray(jsonString)
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
+                val jsonArray = jsonParser.parseToJsonElement(jsonString).jsonArray
+                for (element in jsonArray) {
+                    val obj = element.jsonObject
                     entities.add(
                         UnitGradesEntity(
                             materia = obj.optStringSafe("materia"),
@@ -288,9 +285,9 @@ object SicenetParser {
         try {
             val jsonString = extractJsonContent(xml)
             if (jsonString.startsWith("[")) {
-                val jsonArray = JSONArray(jsonString)
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
+                val jsonArray = jsonParser.parseToJsonElement(jsonString).jsonArray
+                for (element in jsonArray) {
+                    val obj = element.jsonObject
                     entities.add(
                         FinalGradesEntity(
                             materia = obj.optStringSafe("materia"),
@@ -350,7 +347,7 @@ object SicenetParser {
     private fun extractAllTags(xml: String, tagName: String): List<String> {
         val list = mutableListOf<String>()
         try {
-            val pattern = "<(?:\\w+:)?$tagName>(.*?)</(?:\\w+:)?$tagName>".toRegex(setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE))
+            val pattern = "<(?:\\w+:)?$tagName>([\\s\\S]*?)</(?:\\w+:)?$tagName>".toRegex(RegexOption.IGNORE_CASE)
             val matches = pattern.findAll(xml)
             matches.forEach { 
                 list.add(it.groupValues[1].trim())

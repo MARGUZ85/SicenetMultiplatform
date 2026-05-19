@@ -21,8 +21,16 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.shared)
-
+        }
+        wasmJsMain.dependencies {
             implementation(libs.compose.ui)
+            implementation(libs.compose.runtime)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+        }
+        jsMain.dependencies {
+            implementation(libs.compose.ui)
+            implementation(libs.compose.runtime)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
         }
     }
 }

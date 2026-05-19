@@ -1,8 +1,12 @@
-package com.example.marsphotos.data
+package com.example.sicenetmultiplatform.data
 
-import com.example.marsphotos.data.model.LoginResult
-import com.example.marsphotos.data.model.SicenetProfile
-import com.example.marsphotos.network.SicenetService
+import com.example.sicenetmultiplatform.data.model.LoginResult
+import com.example.sicenetmultiplatform.data.model.SicenetProfile
+import com.example.sicenetmultiplatform.network.SicenetService
+import com.example.sicenetmultiplatform.data.local.AcademicLoadEntity
+import com.example.sicenetmultiplatform.data.local.CardexEntity
+import com.example.sicenetmultiplatform.data.local.UnitGradesEntity
+import com.example.sicenetmultiplatform.data.local.FinalGradesEntity
 
 /**
  * [DATA LAYER - REPOSITORY]
@@ -53,7 +57,7 @@ class SicenetRepository(private val service: SicenetService) {
              }
 
              // Extract failure reason if possible
-            val failPattern = "<(?:\\w+:)?accesoLoginResult>(.*?)</(?:\\w+:)?accesoLoginResult>".toRegex(RegexOption.DOT_MATCHES_ALL)
+            val failPattern = "<(?:\\w+:)?accesoLoginResult>([\\s\\S]*?)</(?:\\w+:)?accesoLoginResult>".toRegex()
             val match = failPattern.find(result)
 
             if (match != null) {
@@ -87,6 +91,26 @@ class SicenetRepository(private val service: SicenetService) {
         if (xmlResponse == null) return null
         
         return parseProfileFromXml(xmlResponse)
+    }
+
+    suspend fun getCargaAcademica(): List<AcademicLoadEntity>? {
+        val xml = service.getCargaAcademica() ?: return null
+        return SicenetParser.parseAcademicLoad(xml)
+    }
+
+    suspend fun getCardex(): List<CardexEntity>? {
+        val xml = service.getCardex() ?: return null
+        return SicenetParser.parseCardex(xml)
+    }
+
+    suspend fun getCalifUnidades(): List<UnitGradesEntity>? {
+        val xml = service.getCalifUnidades() ?: return null
+        return SicenetParser.parseUnitGrades(xml)
+    }
+
+    suspend fun getCalifFinales(): List<FinalGradesEntity>? {
+        val xml = service.getCalifFinales() ?: return null
+        return SicenetParser.parseFinalGrades(xml)
     }
 
     private fun parseProfileFromXml(xml: String): SicenetProfile {
@@ -210,7 +234,7 @@ class SicenetRepository(private val service: SicenetService) {
     private fun extractTag(xml: String, tagName: String): String {
         try {
             // Updated to be CASE INSENSITIVE
-            val pattern = "<(?:\\w+:)?$tagName>(.*?)</(?:\\w+:)?$tagName>".toRegex(setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE))
+            val pattern = "<(?:\\w+:)?$tagName>([\\s\\S]*?)</(?:\\w+:)?$tagName>".toRegex(RegexOption.IGNORE_CASE)
             val match = pattern.find(xml)
             return match?.groupValues?.get(1)?.trim() ?: "Unknown"
         } catch (e: Exception) {

@@ -1,4 +1,4 @@
-package com.example.marsphotos.data.model
+package com.example.sicenetmultiplatform.data.model
 
 /**
  * [CAPA DE MODELO - ENTIDAD DE PERFIL]

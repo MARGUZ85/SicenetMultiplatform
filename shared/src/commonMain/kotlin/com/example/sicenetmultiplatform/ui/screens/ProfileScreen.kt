@@ -1,4 +1,4 @@
-package com.example.marsphotos.ui.screens
+package com.example.sicenetmultiplatform.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.marsphotos.data.model.SicenetProfile
+import com.example.sicenetmultiplatform.data.model.SicenetProfile
 
 /**
  * Esta función Composable define cómo se ve la pantalla de Perfil.

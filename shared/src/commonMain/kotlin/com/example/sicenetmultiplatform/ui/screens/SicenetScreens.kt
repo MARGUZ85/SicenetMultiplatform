@@ -1,4 +1,4 @@
-package com.example.marsphotos.ui.screens
+package com.example.sicenetmultiplatform.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.horizontalScroll
@@ -13,12 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.marsphotos.ui.SicenetViewModel
+import com.example.sicenetmultiplatform.ui.SicenetViewModel
+import com.example.sicenetmultiplatform.ui.SyncState
 import androidx.compose.foundation.background
 import androidx.compose.material3.Divider
 import androidx.compose.ui.unit.sp
-import java.text.SimpleDateFormat
-import java.util.Date
+import com.example.sicenetmultiplatform.data.formatTimestamp
 
 @Composable
 fun SicenetMenuScreen(
@@ -59,40 +59,37 @@ fun MenuButton(text: String, onClick: () -> Unit) {
 
 @Composable
 fun SyncStatus(
-    workInfo: androidx.work.WorkInfo?,
+    syncState: SyncState,
     modifier: Modifier = Modifier
 ) {
-    if (workInfo != null) {
-        when (workInfo.state) {
-            androidx.work.WorkInfo.State.RUNNING -> {
-                Row(
-                    modifier = modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Sincronizando...", style = MaterialTheme.typography.bodyMedium)
-                }
+    when (syncState) {
+        SyncState.RUNNING -> {
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Sincronizando...", style = MaterialTheme.typography.bodyMedium)
             }
-            androidx.work.WorkInfo.State.SUCCEEDED -> {
-                Text(
-                    "Sincronización Exitosa",
-                    color = androidx.compose.ui.graphics.Color(0xFF4CAF50), // Green
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = modifier.fillMaxWidth()
-                )
-            }
-            androidx.work.WorkInfo.State.FAILED -> {
-                val error = workInfo.outputData.getString("ERROR") ?: "Error desconocido"
-                Text(
-                    "Error: $error",
-                    color = androidx.compose.ui.graphics.Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = modifier.fillMaxWidth()
-                )
-            }
-            else -> {}
         }
+        SyncState.SUCCESS -> {
+            Text(
+                "Sincronización Exitosa",
+                color = androidx.compose.ui.graphics.Color(0xFF4CAF50), // Green
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = modifier.fillMaxWidth()
+            )
+        }
+        SyncState.ERROR -> {
+            Text(
+                "Error al sincronizar",
+                color = androidx.compose.ui.graphics.Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = modifier.fillMaxWidth()
+            )
+        }
+        SyncState.IDLE -> {}
     }
 }
 
@@ -104,7 +101,7 @@ fun CargaAcademicaScreen(
 ) {
     val load by viewModel.academicLoad.collectAsState()
     val lastUpdate by viewModel.lastUpdateLoad.collectAsState()
-    val workInfo by viewModel.currentWorkInfo.collectAsState()
+    val syncState by viewModel.syncState.collectAsState()
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
 
@@ -112,14 +109,11 @@ fun CargaAcademicaScreen(
             Text("Sincronizar Carga")
         }
         
-        SyncStatus(workInfo = workInfo)
+        SyncStatus(syncState = syncState)
 
         lastUpdate?.let {
             Text(
-                "Actualizado: ${
-                    SimpleDateFormat("dd/MM/yyyy HH:mm")
-                        .format(Date(it))
-                }",
+                "Actualizado: ${formatTimestamp(it)}",
                  style = MaterialTheme.typography.bodySmall
             )
         }
@@ -189,7 +183,7 @@ fun CardexScreen(
 ) {
     val cardex by viewModel.cardex.collectAsState()
     val lastUpdate by viewModel.lastUpdateCardex.collectAsState()
-    val workInfo by viewModel.currentWorkInfo.collectAsState()
+    val syncState by viewModel.syncState.collectAsState()
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
 
@@ -197,14 +191,11 @@ fun CardexScreen(
             Text("Sincronizar Kardex")
         }
         
-        SyncStatus(workInfo = workInfo)
+        SyncStatus(syncState = syncState)
 
         lastUpdate?.let {
             Text(
-                "Actualizado: ${
-                    SimpleDateFormat("dd/MM/yyyy HH:mm")
-                        .format(Date(it))
-                }",
+                "Actualizado: ${formatTimestamp(it)}",
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -291,7 +282,7 @@ fun UnitGradesScreen(
 ) {
     val grades by viewModel.unitGrades.collectAsState()
     val lastUpdate by viewModel.lastUpdateGradesUnits.collectAsState()
-    val workInfo by viewModel.currentWorkInfo.collectAsState()
+    val syncState by viewModel.syncState.collectAsState()
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
 
@@ -299,14 +290,11 @@ fun UnitGradesScreen(
             Text("Sincronizar Unidades")
         }
 
-        SyncStatus(workInfo = workInfo)
+        SyncStatus(syncState = syncState)
 
         lastUpdate?.let {
             Text(
-                "Actualizado: ${
-                    SimpleDateFormat("dd/MM/yyyy HH:mm")
-                        .format(Date(it))
-                }",
+                "Actualizado: ${formatTimestamp(it)}",
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -371,7 +359,7 @@ fun FinalGradesScreen(
 ) {
     val grades by viewModel.finalGrades.collectAsState()
     val lastUpdate by viewModel.lastUpdateGradesFinal.collectAsState()
-    val workInfo by viewModel.currentWorkInfo.collectAsState()
+    val syncState by viewModel.syncState.collectAsState()
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
 
@@ -379,14 +367,11 @@ fun FinalGradesScreen(
             Text("Sincronizar Finales")
         }
         
-        SyncStatus(workInfo = workInfo)
+        SyncStatus(syncState = syncState)
 
         lastUpdate?.let {
             Text(
-                "Actualizado: ${
-                    SimpleDateFormat("dd/MM/yyyy HH:mm")
-                        .format(Date(it))
-                }",
+                "Actualizado: ${formatTimestamp(it)}",
                  style = MaterialTheme.typography.bodySmall
             )
         }

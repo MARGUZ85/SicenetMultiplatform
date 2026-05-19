@@ -1,4 +1,4 @@
-package com.example.marsphotos.network
+package com.example.sicenetmultiplatform.network
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -115,12 +115,7 @@ class SicenetService {
                     val redirectUrl = if (location.startsWith("http")) {
                         location
                     } else {
-                        URLBuilder(SERVICE_URL).apply {
-                            val path = location.substringBefore("?")
-                            val query = location.substringAfter("?", "")
-                            encodedPath = path
-                            if (query.isNotEmpty()) encodedQuery = query
-                        }.buildString()
+                        URLBuilder(SERVICE_URL).takeFrom(location).buildString()
                     }
                     currentUrl = redirectUrl
                     

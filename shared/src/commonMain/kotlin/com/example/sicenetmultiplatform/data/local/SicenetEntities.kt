@@ -1,21 +1,16 @@
-package com.example.marsphotos.data.local
+package com.example.sicenetmultiplatform.data.local
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 
-@InternalSerializationApi /**
+/**
  * [CAPA DE DATOS - ENTIDADES DE PERSISTENCIA]
  * Estas clases definen la estructura de las tablas en la base de datos local (Room).
  * Se marcan como @Serializable para permitir su transporte fácil si fuera necesario.
  */
 
 // --- Tabla: Carga Académica ---
-@Entity(tableName = "academic_load")
 @Serializable
 data class AcademicLoadEntity(
-    @PrimaryKey(autoGenerate = true)
     val id: Int = 0,               // ID único generado automáticamente
 
     val materia: String = "",      // Nombre de la asignatura
@@ -34,11 +29,9 @@ data class AcademicLoadEntity(
 )
 
 
-@InternalSerializationApi // --- Tabla: Kardex (Historial Académico) ---
-@Entity(tableName = "cardex")
+// --- Tabla: Kardex (Historial Académico) ---
 @Serializable
 data class CardexEntity(
-    @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
     val materia: String = "",
@@ -52,11 +45,9 @@ data class CardexEntity(
 )
 
 
-@InternalSerializationApi // --- Tabla: Calificaciones por Unidad (Parciales) ---
-@Entity(tableName = "unit_grades")
+// --- Tabla: Calificaciones por Unidad (Parciales) ---
 @Serializable
 data class UnitGradesEntity(
-    @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
     val materia: String = "",
@@ -79,11 +70,9 @@ data class UnitGradesEntity(
 )
 
 
-@InternalSerializationApi // --- Tabla: Calificaciones Finales ---
-@Entity(tableName = "final_grades")
+// --- Tabla: Calificaciones Finales ---
 @Serializable
 data class FinalGradesEntity(
-    @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
     val materia: String = "",
@@ -94,9 +83,8 @@ data class FinalGradesEntity(
 
 
 // --- Tabla: Registro de Metadatos (Última Actualización) ---
-@Entity(tableName = "last_update_log")
+@Serializable
 data class LastUpdateEntity(
-    @PrimaryKey
     val feature: String,           // Nombre de la sección (ej: "cardex")
 
     val timestamp: Long = 0L       // Fecha y hora en milisegundos de la última sync
