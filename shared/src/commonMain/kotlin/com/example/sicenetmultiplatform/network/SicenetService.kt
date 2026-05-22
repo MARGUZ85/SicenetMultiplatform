@@ -133,6 +133,7 @@ class SicenetService {
                 response.bodyAsText()
             }
         } catch (e: Exception) {
+            println("SicenetService Exception: ${e.message}")
             e.printStackTrace()
             null
         }
